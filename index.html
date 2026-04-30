@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Treino BJJ">
+<title>Treino BJJ</title>
+<style>
+:root{--red:#E94560;--dark:#0a0a12;--bg1:#1a1a2e;--bg2:#16213e;--text:#f0f0f0;--muted:#8892b0;--subtle:#4a5568;--card:rgba(255,255,255,0.04);--border:rgba(255,255,255,0.08);--font:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sans-serif}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden}
+body{font-family:var(--font);background:linear-gradient(160deg,var(--dark) 0%,var(--bg1) 40%,var(--bg2) 100%);color:var(--text)}
+.app{height:100vh;height:100dvh;display:flex;flex-direction:column;overflow:hidden}
+.content{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:80px}
+button{font-family:var(--font);cursor:pointer;border:none;background:none;color:inherit}
+input{font-family:var(--font)}
+
+.tab-bar{position:fixed;bottom:0;left:0;right:0;z-index:20;background:rgba(10,10,18,0.95);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);border-top:1px solid var(--border);padding:8px 0 env(safe-area-inset-bottom,12px);display:flex;justify-content:space-around}
+.tab-btn{display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 16px;color:var(--muted);transition:color 0.2s}
+.tab-btn.active{color:var(--red)}
+.tab-btn svg{width:22px;height:22px}
+.tab-btn span{font-size:10px;font-weight:500;letter-spacing:0.5px}
+.tab-btn.active span{font-weight:700}
+.tab-dot{width:4px;height:4px;border-radius:2px;background:var(--red)}
+
+.pill{font-size:11px;padding:3px 9px;border-radius:6px;font-weight:700;white-space:nowrap;display:inline-flex;align-items:center;gap:3px}
+.pill-red{background:rgba(233,69,96,0.15);color:#ff6b81}
+.pill-blue{background:rgba(100,181,246,0.15);color:#64b5f6}
+.pill-yellow{background:rgba(255,180,0,0.15);color:#ffb400}
+.pill-green{background:rgba(102,187,106,0.15);color:#66bb6a}
+
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px;transition:all 0.2s}
+.section-bar{margin:20px 0 10px;padding:10px 14px;border-radius:10px;background:linear-gradient(135deg,rgba(233,69,96,0.15),rgba(233,69,96,0.03));border-left:3px solid var(--red)}
+.section-bar span{font-size:12px;font-weight:800;letter-spacing:1px;color:var(--red)}
+
+.btn{padding:10px 22px;border-radius:99px;font-size:13px;font-weight:700;transition:all 0.2s}
+.btn-active{background:linear-gradient(135deg,var(--red),#c0392b);color:#fff;box-shadow:0 4px 20px rgba(233,69,96,0.3)}
+.btn-inactive{background:rgba(255,255,255,0.06);color:var(--muted)}
+.btn-sm{padding:6px 14px;font-size:12px}
+
+.sticky-header{position:sticky;top:0;z-index:10;background:rgba(10,10,18,0.9);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:14px 16px}
+
+.exercise-card{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05);border-radius:14px;margin-bottom:8px;padding:14px 16px;cursor:pointer;transition:all 0.2s}
+.exercise-card.expanded{background:rgba(255,255,255,0.06);border-color:rgba(233,69,96,0.25)}
+.exercise-detail{margin-top:14px;padding-top:14px;border-top:1px solid var(--border);display:none}
+.exercise-card.expanded .exercise-detail{display:flex;flex-direction:column;gap:10px}
+.detail-label{font-size:10px;font-weight:700;letter-spacing:1px;margin-bottom:3px}
+.detail-text{font-size:13px;color:#c0c8e0;line-height:1.5}
+
+.macro-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:20px}
+.macro-box{background:var(--card);border-radius:12px;padding:12px 8px;text-align:center}
+.macro-val{font-size:18px;font-weight:800}
+.macro-unit{font-size:9px;color:var(--muted);letter-spacing:0.5px;margin-top:2px}
+.macro-label{font-size:10px;color:var(--muted);margin-top:4px;font-weight:600}
+
+.profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.profile-box{background:rgba(255,255,255,0.03);border-radius:12px;padding:14px;text-align:center}
+.profile-val{font-size:20px;font-weight:800}
+
+.progress-bar{height:8px;background:rgba(255,255,255,0.06);border-radius:99px;overflow:hidden}
+.progress-fill{height:100%;border-radius:99px;transition:width 0.5s}
+
+.upload-card{border-style:dashed;border-color:rgba(255,255,255,0.15);text-align:center;padding:20px 16px;cursor:pointer}
+
+.alert-box{margin:0 0 16px;padding:14px 16px;border-radius:14px;cursor:pointer}
+.alert-yellow{background:rgba(255,180,0,0.1);border:1px solid rgba(255,180,0,0.3)}
+.alert-red{background:rgba(233,69,96,0.12);border:1px solid rgba(233,69,96,0.3)}
+
+.hidden{display:none}
+.meal-options{display:none}
+.meal-card.expanded .meal-options{display:block}
+
+.sweet-card{margin-bottom:8px;border-color:rgba(255,180,0,0.15)}
+
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="content" id="content"></div>
+  <div class="tab-bar">
+    <button class="tab-btn active" data-tab="treinos" onclick="switchTab('treinos')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 6.5h11M6.5 17.5h11M2 12h4m12 0h4M6 12a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm16 0a2 2 0 1 1-4 0 2 2 0 0 1 4 0Z"/></svg>
+      <span>Treinos</span>
+      <div class="tab-dot"></div>
+    </button>
+    <button class="tab-btn" data-tab="dieta" onclick="switchTab('dieta')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.94c1.5 0 2.75 1.06 4 1.06 3 0 6-8 6-12.22A4.91 4.91 0 0 0 17 5c-2.22 0-4 1.44-5 2-1-.56-2.78-2-5-2a4.9 4.9 0 0 0-5 4.78C2 14 5 22 8 22c1.25 0 2.5-1.06 4-1.06Z"/><path d="M10 2c1 .5 2 2 2 5"/></svg>
+      <span>Dieta</span>
+    </button>
+    <button class="tab-btn" data-tab="perfil" onclick="switchTab('perfil')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <span>Perfil</span>
+    </button>
+  </div>
+</div>
+<input type="file" id="fileInput" accept=".json" style="display:none">
+
+<script>
+// ═══════════════════════════════
+// DATA
+// ═══════════════════════════════
+const WORKOUTS = {
+  A: {
+    title: "PUXAR + CORE + GRIP", subtitle: "Costas, Bíceps, Antebraço, Core",
+    bjjContext: "Base de guarda, raspagens e finalizações", icon: "shield",
+    gym: [
+      {s:"AQUECIMENTO — 5 min"},
+      {n:"Remada elástico + rotação torácica",sets:"2",reps:"12/lado",rest:"30s",bjj:"Ativação escapular",note:"Movimento lento e controlado"},
+      {s:"BLOCO PRINCIPAL"},
+      {n:"Barra fixa pronada (pull-up)",sets:"4",reps:"6-8",rest:"90s",bjj:"Força de puxada — controle de guarda",note:"Adicionar peso quando completar 8 rep"},
+      {n:"Remada curvada com barra",sets:"4",reps:"6-8",rest:"90s",bjj:"Força de puxada horizontal",note:"Pegada pronada, sem embalo"},
+      {n:"Remada unilateral com halter",sets:"3",reps:"8-10",rest:"60s",bjj:"Anti-rotação + puxada",note:"Manter quadril neutro"},
+      {n:"Rosca martelo",sets:"3",reps:"10-12",rest:"60s",bjj:"Força de braquiorradial — grip",note:"Excêntrica de 3s"},
+      {s:"GRIP & CORE"},
+      {n:"Farmer's Walk",sets:"3",reps:"30-40m",rest:"60s",bjj:"Grip e estabilidade de tronco",note:"Halteres pesados, ombros ativos"},
+      {n:"Dead hang (suspensão)",sets:"3",reps:"30-45s",rest:"45s",bjj:"Resistência de pegada",note:"Progresso: toalha na barra"},
+      {n:"Pallof Press",sets:"3",reps:"10/lado",rest:"45s",bjj:"Core anti-rotação — passagem de guarda",note:"Braços estendidos, sem girar"},
+      {n:"Prancha com arraste de peso",sets:"3",reps:"30s",rest:"45s",bjj:"Core isométrico + anti-extensão",note:"Arrastar halter abaixo do corpo"},
+    ],
+    home: [
+      {s:"AQUECIMENTO — 5 min"},
+      {n:"Escapular em quadrúpede + rotação",sets:"2",reps:"10/lado",rest:"30s",bjj:"Ativação escapular",note:"Abrir o braço pro teto alternando"},
+      {s:"BLOCO PRINCIPAL"},
+      {n:"Australian pull-up (remada invertida)",sets:"4",reps:"8-12",rest:"60s",bjj:"Força de puxada horizontal",note:"Deitar sob mesa firme e puxar"},
+      {n:"Toalha row isométrico (porta)",sets:"3",reps:"20-30s",rest:"60s",bjj:"Grip + puxada isométrica",note:"Laçar toalha na maçaneta, puxar"},
+      {n:"Superman hold",sets:"3",reps:"30s",rest:"45s",bjj:"Cadeia posterior — base de guarda",note:"Braços e pernas elevados"},
+      {n:"Flexão bíceps isométrica (toalha)",sets:"3",reps:"20s",rest:"45s",bjj:"Força de braço — controle de manga",note:"Pisar na toalha, puxar pra cima"},
+      {s:"GRIP & CORE"},
+      {n:"Dead hang em batente de porta",sets:"3",reps:"20-30s",rest:"45s",bjj:"Resistência de pegada",note:"Só se o batente aguentar!"},
+      {n:"Prancha com shoulder tap",sets:"3",reps:"10/lado",rest:"45s",bjj:"Core anti-rotação",note:"Não girar o quadril ao tocar"},
+      {n:"Hollow body hold",sets:"3",reps:"30s",rest:"45s",bjj:"Core — posição de guarda fechada",note:"Lombar colada no chão"},
+    ],
+  },
+  B: {
+    title: "EMPURRAR + EXPLOSÃO", subtitle: "Peito, Ombros, Tríceps, Potência",
+    bjjContext: "Projeções, pressão de passagem, frames", icon: "zap",
+    gym: [
+      {s:"AQUECIMENTO — 5 min"},
+      {n:"Band pull-apart + push-up escapular",sets:"2",reps:"12+10",rest:"30s",bjj:"Ativação ombro e serrátil",note:"Preparar articulação do ombro"},
+      {s:"BLOCO PRINCIPAL"},
+      {n:"Supino reto com barra",sets:"4",reps:"5-6",rest:"2 min",bjj:"Força de empurrão — frames e escape",note:"Foco em carga, não velocidade"},
+      {n:"Desenvolvimento militar em pé",sets:"4",reps:"6-8",rest:"90s",bjj:"Estabilidade de ombro — pressão top",note:"Core contraído"},
+      {n:"Flexão com palmada (plyo push-up)",sets:"3",reps:"5-6",rest:"90s",bjj:"Potência de empurrão",note:"Explosão máxima, qualidade > volume"},
+      {n:"Tríceps francês com barra EZ",sets:"3",reps:"10-12",rest:"60s",bjj:"Força de extensão — kimuras, frames",note:"Excêntrica controlada"},
+      {s:"EXPLOSÃO + CONDICIONAMENTO"},
+      {n:"Kettlebell swing",sets:"4",reps:"12-15",rest:"60s",bjj:"Potência de quadril — projeções",note:"Extensão total do quadril no topo"},
+      {n:"Med ball slam",sets:"3",reps:"8-10",rest:"60s",bjj:"Potência total do corpo",note:"Usar bola que não quica"},
+      {n:"Battle rope — ondas alternadas",sets:"3",reps:"30s",rest:"45s",bjj:"Condicionamento + resistência ombro",note:"Ritmo constante até o fim"},
+    ],
+    home: [
+      {s:"AQUECIMENTO — 5 min"},
+      {n:"Círculos de braço + push-up escapular",sets:"2",reps:"10+10",rest:"30s",bjj:"Ativação ombro e serrátil",note:"Movimentos amplos e controlados"},
+      {s:"BLOCO PRINCIPAL"},
+      {n:"Flexão declinada (pés no sofá)",sets:"4",reps:"10-15",rest:"60s",bjj:"Empurrão com mais carga no ombro",note:"Corpo reto, descer até o chão"},
+      {n:"Pike push-up",sets:"4",reps:"8-10",rest:"60s",bjj:"Força de ombro — overhead press",note:"Quadril alto, cabeça entre os braços"},
+      {n:"Flexão com palmada",sets:"3",reps:"5-6",rest:"90s",bjj:"Potência de empurrão",note:"Explosão máxima"},
+      {n:"Flexão diamante",sets:"3",reps:"10-12",rest:"60s",bjj:"Tríceps — frames e kimuras",note:"Mãos formando diamante"},
+      {s:"EXPLOSÃO + CONDICIONAMENTO"},
+      {n:"Broad jump",sets:"4",reps:"6",rest:"60s",bjj:"Potência de quadril — projeções",note:"Aterrissar suave"},
+      {n:"Burpee com palmada no topo",sets:"3",reps:"8",rest:"60s",bjj:"Potência total do corpo",note:"Explosão no salto"},
+      {n:"Mountain climber sprint",sets:"3",reps:"30s",rest:"45s",bjj:"Condicionamento + resistência",note:"Máxima velocidade controlada"},
+    ],
+  },
+  C: {
+    title: "PERNAS + COND. METABÓLICO", subtitle: "Quadríceps, Posterior, Glúteo",
+    bjjContext: "Projeção, guard retention, scrambles", icon: "flame",
+    gym: [
+      {s:"AQUECIMENTO — 5 min"},
+      {n:"Agachamento livre + mob. quadril",sets:"2",reps:"10+5/lado",rest:"30s",bjj:"Ativar cadeia posterior + mobilidade",note:"Pausa de 2s no fundo"},
+      {s:"BLOCO PRINCIPAL"},
+      {n:"Agachamento livre (back squat)",sets:"4",reps:"5-6",rest:"2 min",bjj:"Força de base — projeções, sprawl",note:"Paralelo ou abaixo"},
+      {n:"Levantamento terra romeno",sets:"4",reps:"6-8",rest:"90s",bjj:"Posterior de coxa + glúteo",note:"Barra próxima ao corpo"},
+      {n:"Avanço búlgaro (split squat)",sets:"3",reps:"8/perna",rest:"60s",bjj:"Força unilateral — estabilidade",note:"Pé traseiro elevado no banco"},
+      {n:"Hip thrust com barra",sets:"3",reps:"8-10",rest:"60s",bjj:"Potência de quadril — bridge BJJ",note:"Pausa de 1s no topo"},
+      {s:"CIRCUITO METABÓLICO — 3 rounds"},
+      {n:"Burpee sprawl",sets:"—",reps:"8",rest:"0s",bjj:"Explosão + sprawl defense",note:"Simular defesa de queda"},
+      {n:"Remada renegade c/ halteres",sets:"—",reps:"6/lado",rest:"0s",bjj:"Anti-rotação + puxada",note:"Não girar o quadril"},
+      {n:"Box jump",sets:"—",reps:"8",rest:"0s",bjj:"Potência de membros inferiores",note:"Aterrissar suave"},
+      {n:"Descanso entre rounds",sets:"—",reps:"—",rest:"90s",bjj:"Recuperação ativa",note:"Caminhar, não sentar"},
+    ],
+    home: [
+      {s:"AQUECIMENTO — 5 min"},
+      {n:"Agachamento + world's greatest stretch",sets:"2",reps:"8+5/lado",rest:"30s",bjj:"Ativar cadeia posterior + mobilidade",note:"Movimento fluido e amplo"},
+      {s:"BLOCO PRINCIPAL"},
+      {n:"Agachamento pistol (ou assistido)",sets:"4",reps:"5/perna",rest:"90s",bjj:"Força unilateral máxima",note:"Segurar em porta se necessário"},
+      {n:"Stiff unilateral (single leg RDL)",sets:"4",reps:"8/perna",rest:"60s",bjj:"Posterior + equilíbrio",note:"Braços à frente como contrapeso"},
+      {n:"Avanço caminhando",sets:"3",reps:"10/perna",rest:"60s",bjj:"Força unilateral funcional",note:"Passos longos, joelho quase no chão"},
+      {n:"Glute bridge unilateral",sets:"3",reps:"12/perna",rest:"45s",bjj:"Potência de bridge — escape montada",note:"Pausa no topo, contrair glúteo"},
+      {s:"CIRCUITO METABÓLICO — 3 rounds"},
+      {n:"Burpee sprawl",sets:"—",reps:"8",rest:"0s",bjj:"Explosão + sprawl defense",note:"Simular defesa de queda"},
+      {n:"Prancha com shoulder tap",sets:"—",reps:"8/lado",rest:"0s",bjj:"Anti-rotação + core",note:"Quadril travado"},
+      {n:"Jump squat",sets:"—",reps:"10",rest:"0s",bjj:"Potência de membros inferiores",note:"Aterrissar suave, agachar fundo"},
+      {n:"Descanso entre rounds",sets:"—",reps:"—",rest:"90s",bjj:"Recuperação ativa",note:"Caminhar, não sentar"},
+    ],
+  },
+};
+
+const ICONS = {
+  shield: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="22" height="22"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
+  zap: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="22" height="22"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>',
+  flame: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="22" height="22"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.07-2.14 0-5.5 3-7 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.15.5-2.5 1.5-3"/></svg>',
+  check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><polyline points="20 6 9 17 4 12"/></svg>',
+  chevDown: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="6 9 12 15 18 9"/></svg>',
+  chevUp: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polyline points="18 15 12 9 6 15"/></svg>',
+  chevRight: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><polyline points="9 18 15 12 9 6"/></svg>',
+  chevLeft: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><polyline points="15 18 9 12 15 6"/></svg>',
+  upload: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>',
+  alert: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
+  clock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="10" height="10"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
+  edit: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>',
+  trophy: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>',
+  refresh: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>',
+  cookie: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M12 2a10 10 0 1 0 10 10 4 4 0 0 1-5-5 4 4 0 0 1-5-5"/><path d="M8.5 8.5v.01"/><path d="M16 15.5v.01"/><path d="M12 12v.01"/><path d="M11 17v.01"/><path d="M7 14v.01"/></svg>',
+  info: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>',
+  dumbbell: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M6.5 6.5h11M6.5 17.5h11M2 12h4m12 0h4M6 12a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm16 0a2 2 0 1 1-4 0 2 2 0 0 1 4 0Z"/></svg>',
+  dumbbellLg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="22" height="22"><path d="M6.5 6.5h11M6.5 17.5h11M2 12h4m12 0h4M6 12a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm16 0a2 2 0 1 1-4 0 2 2 0 0 1 4 0Z"/></svg>',
+  home: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',
+  apple: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="22" height="22"><path d="M12 20.94c1.5 0 2.75 1.06 4 1.06 3 0 6-8 6-12.22A4.91 4.91 0 0 0 17 5c-2.22 0-4 1.44-5 2-1-.56-2.78-2-5-2a4.9 4.9 0 0 0-5 4.78C2 14 5 22 8 22c1.25 0 2.5-1.06 4-1.06Z"/><path d="M10 2c1 .5 2 2 2 5"/></svg>',
+  utensils: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="48" height="48"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg>',
+  user: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="22" height="22"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
+  moon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>',
+  clipboard: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg>',
+};
+
+// ═══════════════════════════════
+// STATE
+// ═══════════════════════════════
+let state = {
+  tab: 'treinos',
+  activeWorkout: null,
+  mode: 'gym',
+  expandedIdx: null,
+  expandedMeal: null,
+  editingWeight: false,
+  showAlert: false,
+  showTips: false,
+  dietDayType: 'training',
+};
+
+function load(key, fallback) { try { const v = localStorage.getItem('bjj_'+key); return v ? JSON.parse(v) : fallback; } catch(e) { return fallback; } }
+function save(key, val) { try { localStorage.setItem('bjj_'+key, JSON.stringify(val)); } catch(e) {} }
+
+let weight = load('weight', 77);
+let sessions = load('sessions', []);
+let customWorkouts = load('workouts', null);
+let diet = load('diet', null);
+
+function getWorkouts() { return customWorkouts || WORKOUTS; }
+
+// ═══════════════════════════════
+// RENDER
+// ═══════════════════════════════
+const $ = id => document.getElementById(id);
+const content = () => document.getElementById('content');
+
+function switchTab(t) {
+  state.tab = t; state.activeWorkout = null; state.expandedIdx = null; state.expandedMeal = null;
+  document.querySelectorAll('.tab-btn').forEach(b => {
+    const isActive = b.dataset.tab === t;
+    b.className = 'tab-btn' + (isActive ? ' active' : '');
+    const dot = b.querySelector('.tab-dot');
+    if (isActive && !dot) b.insertAdjacentHTML('beforeend','<div class="tab-dot"></div>');
+    else if (!isActive && dot) dot.remove();
+  });
+  render();
+}
+
+function render() {
+  const c = content();
+  c.scrollTop = 0;
+  if (state.tab === 'treinos' && !state.activeWorkout) c.innerHTML = renderWorkoutList();
+  else if (state.tab === 'treinos' && state.activeWorkout) c.innerHTML = renderWorkoutDetail();
+  else if (state.tab === 'dieta') c.innerHTML = renderDiet();
+  else if (state.tab === 'perfil') c.innerHTML = renderProfile();
+}
+
+function todayStr() { return new Date().toISOString().split('T')[0]; }
+function isDoneToday(key, mode) { return sessions.some(s => s.w === key && s.d === todayStr() && s.m === mode); }
+function totalSessions() { return sessions.length; }
+function weeksCompleted() { return Math.floor(sessions.length / 3); }
+function alertLevel() { const t = totalSessions(); return t >= 36 ? 2 : t >= 24 ? 1 : 0; }
+
+function renderWorkoutList() {
+  const w = getWorkouts();
+  const al = alertLevel();
+  let alertHTML = '';
+  if (al > 0) {
+    alertHTML = `<div class="alert-box ${al===2?'alert-red':'alert-yellow'}" onclick="state.showAlert=!state.showAlert;render()">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="color:${al===2?'var(--red)':'#ffb400'}">${ICONS.alert}</span>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:700;color:${al===2?'var(--red)':'#ffb400'}">${al===2?'Hora de trocar o treino!':'Troca de treino se aproximando'}</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px">${totalSessions()} sessões (~${weeksCompleted()} semanas)</div>
+        </div>
+      </div>
+      ${state.showAlert?`<div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);font-size:12px;color:#a0a8c0;line-height:1.6">${al===2?'Mais de 12 semanas. Peça atualização e faça upload do JSON novo.':'~8 semanas. Planeje a próxima fase (8-12 semanas ideal).'}</div>`:''}
+    </div>`;
+  }
+
+  let cards = '';
+  for (const [key, wo] of Object.entries(w)) {
+    const done = isDoneToday(key, state.mode);
+    cards += `<div class="card" style="margin-bottom:12px;cursor:pointer;position:relative;overflow:hidden" onclick="state.activeWorkout='${key}';state.expandedIdx=null;render()">
+      <div style="position:absolute;top:0;right:0;width:80px;height:80px;background:radial-gradient(circle at 100% 0%,rgba(233,69,96,0.1),transparent 70%);pointer-events:none"></div>
+      <div style="display:flex;align-items:center;gap:14px">
+        <div style="width:50px;height:50px;border-radius:14px;background:linear-gradient(135deg,rgba(233,69,96,0.2),rgba(233,69,96,0.06));display:flex;align-items:center;justify-content:center;border:1px solid rgba(233,69,96,0.25);flex-shrink:0;color:var(--red)">${ICONS[wo.icon]}</div>
+        <div style="flex:1">
+          <span class="pill pill-red">TREINO ${key}</span>
+          <div style="font-size:15px;font-weight:700;margin:6px 0 2px">${wo.title}</div>
+          <div style="font-size:12px;color:var(--muted)">${wo.bjjContext}</div>
+        </div>
+        ${done?'<span style="color:var(--red)">'+ICONS.check+'</span>':''}
+        <span style="color:var(--muted)">${ICONS.chevRight}</span>
+      </div>
+    </div>`;
+  }
+
+  return `<div style="padding:20px 16px">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+      <span style="color:var(--red)">${ICONS.shield}</span>
+      <h2 style="font-size:22px;font-weight:800">Treinos</h2>
+    </div>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:20px;letter-spacing:1.5px;text-transform:uppercase">Força & Condicionamento BJJ</p>
+    <div style="display:flex;gap:8px;margin-bottom:20px">
+      <button class="btn btn-sm ${state.mode==='gym'?'btn-active':'btn-inactive'}" onclick="state.mode='gym';render()"><span style="display:inline-flex;align-items:center;gap:5px">${ICONS.dumbbell} Academia</span></button>
+      <button class="btn btn-sm ${state.mode==='home'?'btn-active':'btn-inactive'}" onclick="state.mode='home';render()"><span style="display:inline-flex;align-items:center;gap:5px">${ICONS.home} Casa</span></button>
+    </div>
+    ${alertHTML}
+    ${cards}
+    <div class="card upload-card" onclick="uploadFile('workouts')">
+      <div style="display:flex;align-items:center;justify-content:center;gap:10px">
+        <span style="color:var(--muted)">${ICONS.upload}</span>
+        <span style="font-size:13px;color:var(--muted);font-weight:600">Atualizar treinos (upload JSON)</span>
+      </div>
+    </div>
+    <button style="width:100%;margin-top:12px;padding:14px;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:14px;color:var(--muted);font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:8px" onclick="state.showTips=!state.showTips;render()">
+      ${ICONS.clipboard} Orientações ${state.showTips?ICONS.chevUp:ICONS.chevDown}
+    </button>
+    ${state.showTips?`<div style="margin-top:8px;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:14px;padding:16px">
+      ${[{t:'Progressão',d:'Aumente 2-5% de carga quando completar todas as séries com boa técnica.'},{t:'Ciclo',d:'3 semanas progressivas + 1 deload (−40%). Troque a cada 8-12 semanas.'},{t:'Duração',d:'45-60 min máximo. Treinos longos elevam cortisol.'},{t:'Sono',d:'Mínimo 7-8h. Sem sono, sem progresso.'},{t:'Hidratação',d:'Mínimo 3L/dia. Aumentar em dias de treino duplo.'}].map(t=>`<div style="margin-bottom:12px"><div style="font-size:12px;font-weight:700;color:var(--red);margin-bottom:2px">${t.t}</div><div style="font-size:12px;color:#a0a8c0;line-height:1.5">${t.d}</div></div>`).join('')}
+    </div>`:''}
+  </div>`;
+}
+
+function renderWorkoutDetail() {
+  const w = getWorkouts()[state.activeWorkout];
+  const exs = state.mode === 'gym' ? w.gym : w.home;
+  const done = isDoneToday(state.activeWorkout, state.mode);
+
+  let exerciseHTML = '';
+  exs.forEach((ex, i) => {
+    if (ex.s) {
+      exerciseHTML += `<div class="section-bar"><span>${ex.s}</span></div>`;
+      return;
+    }
+    const isExp = state.expandedIdx === i;
+    exerciseHTML += `<div class="exercise-card ${isExp?'expanded':''}" onclick="state.expandedIdx=${isExp?'null':i};render()">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div style="flex:1;margin-right:8px">
+          <div style="font-size:14px;font-weight:600;margin-bottom:6px">${ex.n}</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <span class="pill pill-red">${ex.sets!=='—'?ex.sets+'×'+ex.reps:ex.reps}</span>
+            ${ex.rest!=='0s'?`<span class="pill pill-blue">${ICONS.clock} ${ex.rest}</span>`:''}
+          </div>
+        </div>
+        <span style="color:var(--muted)">${isExp?ICONS.chevUp:ICONS.chevDown}</span>
+      </div>
+      <div class="exercise-detail">
+        <div><div class="detail-label" style="color:var(--red)">TRANSFERÊNCIA BJJ</div><div class="detail-text">${ex.bjj}</div></div>
+        <div><div class="detail-label" style="color:#64b5f6">EXECUÇÃO</div><div class="detail-text">${ex.note}</div></div>
+      </div>
+    </div>`;
+  });
+
+  return `<div>
+    <div class="sticky-header">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+        <button style="background:rgba(255,255,255,0.08);border-radius:10px;width:36px;height:36px;display:flex;align-items:center;justify-content:center" onclick="state.activeWorkout=null;state.expandedIdx=null;render()">${ICONS.chevLeft}</button>
+        <div style="flex:1">
+          <div style="font-size:11px;font-weight:800;color:var(--red);letter-spacing:1.5px">TREINO ${state.activeWorkout} — ${state.mode==='gym'?'ACADEMIA':'CASA'}</div>
+          <div style="font-size:16px;font-weight:700">${w.title}</div>
+        </div>
+        <span style="color:var(--red)">${ICONS[w.icon]}</span>
+      </div>
+      <div style="display:flex;gap:6px">
+        <button class="btn btn-sm ${state.mode==='gym'?'btn-active':'btn-inactive'}" onclick="state.mode='gym';state.expandedIdx=null;render()"><span style="display:inline-flex;align-items:center;gap:5px">${ICONS.dumbbell} Academia</span></button>
+        <button class="btn btn-sm ${state.mode==='home'?'btn-active':'btn-inactive'}" onclick="state.mode='home';state.expandedIdx=null;render()"><span style="display:inline-flex;align-items:center;gap:5px">${ICONS.home} Casa</span></button>
+      </div>
+    </div>
+    <div style="padding:12px 16px">
+      ${exerciseHTML}
+      <button onclick="toggleSession('${state.activeWorkout}','${state.mode}')" style="width:100%;margin-top:16px;padding:16px;border-radius:14px;font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:10px;${done?'background:rgba(255,255,255,0.06);color:var(--muted)':'background:linear-gradient(135deg,var(--red),#c0392b);color:#fff;box-shadow:0 4px 24px rgba(233,69,96,0.3)'}">
+        ${ICONS.check} ${done?'Treino concluído — toque para desmarcar':'Marcar treino como concluído'}
+      </button>
+    </div>
+  </div>`;
+}
+
+function renderDiet() {
+  if (!diet) {
+    return `<div style="padding:20px 16px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
+        <span style="color:var(--red)">${ICONS.apple}</span>
+        <h2 style="font-size:22px;font-weight:800">Dieta</h2>
+      </div>
+      <div class="card" style="text-align:center;padding:40px 20px">
+        <div style="opacity:0.3;margin-bottom:16px">${ICONS.utensils}</div>
+        <p style="font-size:15px;color:var(--muted);margin-bottom:6px">Nenhuma dieta carregada</p>
+        <p style="font-size:12px;color:var(--subtle);margin-bottom:20px;line-height:1.6">Use o prompt gerado para criar sua dieta. Depois faça upload do JSON aqui.</p>
+        <button class="btn btn-active" onclick="uploadFile('diet')">
+          <span style="display:flex;align-items:center;gap:8px">${ICONS.upload} Upload da Dieta (JSON)</span>
+        </button>
+      </div>
+    </div>`;
+  }
+
+  const targets = diet.daily_targets?.[state.dietDayType==='training'?'training_day':'rest_day'];
+  let macroHTML = '';
+  if (targets) {
+    macroHTML = `<div class="macro-grid">
+      ${[{l:'Calorias',v:targets.calories,u:'kcal',c:'var(--red)'},{l:'Proteína',v:targets.protein_g,u:'g',c:'#64b5f6'},{l:'Carbs',v:targets.carbs_g,u:'g',c:'#ffb400'},{l:'Gordura',v:targets.fat_g,u:'g',c:'#66bb6a'}].map(m=>`<div class="macro-box" style="border:1px solid ${m.c}20"><div class="macro-val" style="color:${m.c}">${m.v}</div><div class="macro-unit">${m.u}</div><div class="macro-label">${m.l}</div></div>`).join('')}
+    </div>`;
+  }
+
+  let mealsHTML = '';
+  (diet.meals||[]).forEach((meal, mi) => {
+    const isExp = state.expandedMeal === mi;
+    let tag = '';
+    if (meal.is_pre_workout) tag = '<span class="pill pill-red">PRÉ-TREINO</span>';
+    else if (meal.is_post_workout) tag = '<span class="pill pill-blue">PÓS-TREINO</span>';
+    else tag = ICONS.clock.replace(/10/g,'16');
+
+    let optionsHTML = '';
+    (meal.options||[]).forEach((opt, oi) => {
+      let items = (opt.items||[]).map(it=>`<div style="font-size:12px;color:#a0a8c0;padding:3px 0 3px 12px;border-left:2px solid rgba(233,69,96,0.12)">${it}</div>`).join('');
+      optionsHTML += `<div style="margin-top:${oi===0?14:10}px;padding-top:${oi===0?14:10}px;border-top:1px solid ${oi===0?'var(--border)':'rgba(255,255,255,0.03)'}">
+        <div style="font-size:12px;font-weight:700;color:var(--red);margin-bottom:6px">${opt.label}</div>
+        ${opt.description?`<div style="font-size:13px;color:#c0c8e0;margin-bottom:8px">${opt.description}</div>`:''}
+        ${items?`<div style="margin-bottom:8px">${items}</div>`:''}
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          ${opt.calories!=null?`<span class="pill pill-red">${opt.calories} kcal</span>`:''}
+          ${opt.protein_g!=null?`<span class="pill pill-blue">${opt.protein_g}g prot</span>`:''}
+          ${opt.carbs_g!=null?`<span class="pill pill-yellow">${opt.carbs_g}g carb</span>`:''}
+          ${opt.fat_g!=null?`<span class="pill pill-green">${opt.fat_g}g gord</span>`:''}
+        </div>
+      </div>`;
+    });
+
+    mealsHTML += `<div style="margin-bottom:10px">
+      <div class="card ${isExp?'expanded':''}" style="cursor:pointer;${isExp?'border-color:rgba(233,69,96,0.25);background:rgba(255,255,255,0.06)':''}" onclick="state.expandedMeal=${isExp?'null':mi};render()">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="color:var(--muted)">${tag}</span>
+            <div>
+              <div style="font-size:14px;font-weight:700">${meal.name}</div>
+              ${meal.time?`<div style="font-size:11px;color:var(--muted)">${meal.time}</div>`:''}
+            </div>
+          </div>
+          <span style="color:var(--muted)">${isExp?ICONS.chevUp:ICONS.chevDown}</span>
+        </div>
+        ${isExp?optionsHTML:''}
+      </div>
+    </div>`;
+  });
+
+  let sweetHTML = '';
+  if (diet.sweet_options?.length) {
+    sweetHTML = `<div style="display:flex;align-items:center;gap:8px;margin:20px 0 12px">
+      <span style="color:#ffb400">${ICONS.cookie}</span>
+      <span style="font-size:13px;font-weight:700;color:#ffb400">Doces Permitidos</span>
+      ${diet.sweet_days?`<span style="font-size:11px;color:var(--muted)">(${diet.sweet_days.join(', ')})</span>`:''}
+    </div>`;
+    diet.sweet_options.forEach(sw => {
+      sweetHTML += `<div class="card sweet-card" style="margin-bottom:8px">
+        <div style="font-size:13px;font-weight:600;margin-bottom:4px">${sw.label}</div>
+        <div style="font-size:12px;color:#a0a8c0;margin-bottom:6px">${sw.description}</div>
+        <div style="display:flex;gap:6px">
+          <span class="pill pill-yellow">${sw.calories} kcal</span>
+          ${sw.protein_g!=null?`<span class="pill pill-blue">${sw.protein_g}g prot</span>`:''}
+        </div>
+      </div>`;
+    });
+  }
+
+  return `<div style="padding:20px 16px">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
+      <span style="color:var(--red)">${ICONS.apple}</span>
+      <h2 style="font-size:22px;font-weight:800">Dieta</h2>
+    </div>
+    ${diet.title?`<p style="font-size:12px;color:var(--muted);margin-bottom:16px">${diet.title}</p>`:''}
+    <div style="display:flex;gap:8px;margin-bottom:16px">
+      <button class="btn btn-sm ${state.dietDayType==='training'?'btn-active':'btn-inactive'}" onclick="state.dietDayType='training';state.expandedMeal=null;render()"><span style="display:inline-flex;align-items:center;gap:5px">${ICONS.dumbbell} Dia de Treino</span></button>
+      <button class="btn btn-sm ${state.dietDayType==='rest'?'btn-active':'btn-inactive'}" onclick="state.dietDayType='rest';state.expandedMeal=null;render()"><span style="display:inline-flex;align-items:center;gap:5px">${ICONS.moon} Dia de Descanso</span></button>
+    </div>
+    ${macroHTML}
+    ${mealsHTML}
+    ${sweetHTML}
+    ${diet.notes?`<div class="card" style="margin-top:16px;border-color:rgba(233,69,96,0.12)"><div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span style="color:var(--red)">${ICONS.info}</span><span style="font-size:12px;font-weight:700;color:var(--red)">OBSERVAÇÕES</span></div><div style="font-size:12px;color:#a0a8c0;line-height:1.6">${diet.notes}</div></div>`:''}
+    <div class="card upload-card" style="margin-top:16px" onclick="uploadFile('diet')">
+      <div style="display:flex;align-items:center;justify-content:center;gap:10px">
+        <span style="color:var(--muted)">${ICONS.upload}</span>
+        <span style="font-size:13px;color:var(--muted);font-weight:600">Atualizar dieta (upload JSON)</span>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderProfile() {
+  const ts = totalSessions();
+  const wc = weeksCompleted();
+  const al = alertLevel();
+  const imc = (weight / (1.65*1.65)).toFixed(1);
+  const progressWeight = Math.min(100, Math.max(0, ((77 - weight) / 7) * 100));
+  const progressCycle = Math.min(100, (ts / 36) * 100);
+  const remaining = Math.max(0, weight - 70).toFixed(1);
+
+  let sessHTML = '';
+  if (sessions.length > 0) {
+    sessHTML = `<div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border)">
+      <div style="font-size:12px;font-weight:600;color:var(--muted);margin-bottom:8px">Últimas sessões</div>
+      ${[...sessions].reverse().slice(0,6).map(s=>`<div style="display:flex;align-items:center;gap:8px;padding:4px 0;font-size:12px">
+        <span style="color:var(--red)">${ICONS.check}</span>
+        <span class="pill pill-red">${s.w}</span>
+        <span style="color:var(--muted)">${s.m==='gym'?'Academia':'Casa'}</span>
+        <span style="color:var(--subtle);margin-left:auto">${s.d}</span>
+      </div>`).join('')}
+    </div>
+    <button style="width:100%;margin-top:14px;padding:10px;border-radius:10px;background:rgba(255,255,255,0.03);border:1px solid var(--border);color:var(--muted);font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:6px" onclick="resetSessions()">
+      ${ICONS.refresh} Resetar histórico (novo ciclo)
+    </button>`;
+  }
+
+  return `<div style="padding:20px 16px">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
+      <span style="color:var(--red)">${ICONS.user}</span>
+      <h2 style="font-size:22px;font-weight:800">Perfil</h2>
+    </div>
+
+    <div class="card" style="margin-bottom:16px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <span style="font-size:14px;font-weight:700">Dados do Atleta</span>
+        <span class="pill pill-red">BJJ</span>
+      </div>
+      <div class="profile-grid">
+        <div class="profile-box"><div style="font-size:11px;color:var(--muted);margin-bottom:4px">Idade</div><div class="profile-val">27</div></div>
+        <div class="profile-box"><div style="font-size:11px;color:var(--muted);margin-bottom:4px">Altura</div><div class="profile-val">1,65m</div></div>
+        <div class="profile-box" id="weightBox">
+          <div style="font-size:11px;color:var(--muted);margin-bottom:4px">Peso Atual</div>
+          ${state.editingWeight
+            ?`<div style="display:flex;align-items:center;justify-content:center;gap:4px">
+              <input id="weightInput" type="number" step="0.1" value="${weight}" style="width:60px;background:rgba(255,255,255,0.1);border:1px solid var(--red);border-radius:8px;color:var(--text);font-size:16px;font-weight:800;text-align:center;padding:4px;outline:none">
+              <button onclick="saveNewWeight()" style="background:var(--red);border-radius:8px;padding:6px;display:flex">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" width="14" height="14"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"/><path d="M17 21v-8H7v8"/><path d="M7 3v5h8"/></svg>
+              </button>
+            </div>`
+            :`<div onclick="state.editingWeight=true;render();setTimeout(()=>{const i=document.getElementById('weightInput');if(i)i.focus()},50)" style="cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">
+              <span class="profile-val">${weight}kg</span>
+              <span style="color:var(--muted)">${ICONS.edit}</span>
+            </div>`}
+        </div>
+        <div class="profile-box"><div style="font-size:11px;color:var(--muted);margin-bottom:4px">Objetivo</div><div class="profile-val" style="color:var(--red)">70kg</div></div>
+      </div>
+      <div style="margin-top:16px;background:rgba(255,255,255,0.03);border-radius:12px;padding:14px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <span style="font-size:12px;color:var(--muted)">Progresso de peso</span>
+          <span style="font-size:12px;color:var(--red);font-weight:700">${remaining}kg restantes</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="background:linear-gradient(90deg,var(--red),#ff6b81);width:${progressWeight}%"></div></div>
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--subtle);margin-top:4px"><span>77kg</span><span>70kg</span></div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:16px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+        <span style="color:var(--red)">${ICONS.trophy}</span>
+        <span style="font-size:14px;font-weight:700">Histórico de Treinos</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px">
+        <div style="text-align:center"><div style="font-size:28px;font-weight:800;color:var(--red)">${ts}</div><div style="font-size:10px;color:var(--muted)">Sessões</div></div>
+        <div style="text-align:center"><div style="font-size:28px;font-weight:800;color:#64b5f6">${wc}</div><div style="font-size:10px;color:var(--muted)">Semanas</div></div>
+        <div style="text-align:center"><div style="font-size:28px;font-weight:800;color:#66bb6a">${ts>=36?'MAX':Math.round(progressCycle)+'%'}</div><div style="font-size:10px;color:var(--muted)">Ciclo</div></div>
+      </div>
+      <div style="height:6px;background:rgba(255,255,255,0.06);border-radius:99px;overflow:hidden;margin-bottom:8px">
+        <div style="height:100%;border-radius:99px;transition:width 0.5s;width:${progressCycle}%;background:${ts>=36?'linear-gradient(90deg,var(--red),#ff6b81)':ts>=24?'linear-gradient(90deg,#ffb400,#ff8c00)':'linear-gradient(90deg,#66bb6a,#43a047)'}"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted)"><span>0</span><span style="color:#ffb400">24 (trocar?)</span><span style="color:var(--red)">36 (trocar!)</span></div>
+      ${sessHTML}
+    </div>
+
+    <div class="card">
+      <div style="font-size:14px;font-weight:700;margin-bottom:12px">IMC Atual</div>
+      <div style="display:flex;align-items:baseline;gap:6px">
+        <span style="font-size:32px;font-weight:800;color:var(--red)">${imc}</span>
+        <span style="font-size:13px;color:var(--muted)">kg/m²</span>
+      </div>
+      <div style="font-size:12px;color:#a0a8c0;margin-top:6px">${parseFloat(imc)<24.9?'Peso normal — foco em recomposição corporal':'Sobrepeso leve — déficit calórico moderado recomendado'}</div>
+    </div>
+  </div>`;
+}
+
+// ═══════════════════════════════
+// ACTIONS
+// ═══════════════════════════════
+function toggleSession(key, mode) {
+  const today = todayStr();
+  const exists = sessions.findIndex(s => s.w === key && s.d === today && s.m === mode);
+  if (exists >= 0) sessions.splice(exists, 1);
+  else sessions.push({ w: key, m: mode, d: today });
+  save('sessions', sessions);
+  render();
+}
+
+function saveNewWeight() {
+  const input = document.getElementById('weightInput');
+  if (!input) return;
+  const val = parseFloat(input.value);
+  if (!isNaN(val) && val > 0) {
+    weight = val;
+    save('weight', weight);
+    state.editingWeight = false;
+    render();
+  }
+}
+
+function resetSessions() {
+  if (confirm('Tem certeza? Isso vai zerar todo o histórico de sessões.')) {
+    sessions = [];
+    save('sessions', sessions);
+    render();
+  }
+}
+
+let uploadType = '';
+function uploadFile(type) {
+  uploadType = type;
+  document.getElementById('fileInput').click();
+}
+
+document.getElementById('fileInput').addEventListener('change', function(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    try {
+      const data = JSON.parse(ev.target.result);
+      if (uploadType === 'workouts') {
+        customWorkouts = data;
+        save('workouts', data);
+      } else {
+        diet = data;
+        save('diet', data);
+      }
+      render();
+    } catch(err) {
+      alert('Erro ao ler o arquivo JSON. Verifique o formato.');
+    }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+});
+
+// ═══════════════════════════════
+// INIT
+// ═══════════════════════════════
+render();
+</script>
+</body>
+</html>
