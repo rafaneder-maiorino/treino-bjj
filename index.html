@@ -18,7 +18,9 @@ body{min-height:100%;overflow:hidden;font-family:var(--font);background:linear-g
 button{font-family:var(--font);cursor:pointer;border:none;background:none;color:inherit}
 input{font-family:var(--font)}
 
-.tab-bar{position:fixed;bottom:0;left:0;right:0;z-index:20;background:rgba(10,10,18,0.95);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);border-top:1px solid var(--border);padding:8px 0 calc(env(safe-area-inset-bottom,12px) + 4px);display:flex;justify-content:space-around}
+.tab-bar{position:fixed;bottom:0;left:0;right:0;z-index:20;background:var(--dark);border-top:1px solid var(--border);display:flex;flex-direction:column}
+.tab-bar-inner{display:flex;justify-content:space-around;padding:8px 0 4px}
+.tab-bar-safe{height:env(safe-area-inset-bottom,0px);background:var(--dark)}
 .tab-btn{display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 16px;color:var(--muted);transition:color 0.2s}
 .tab-btn.active{color:var(--red)}
 .tab-btn svg{width:22px;height:22px}
@@ -82,19 +84,22 @@ input{font-family:var(--font)}
 <div class="app">
   <div class="content" id="content"></div>
   <div class="tab-bar">
-    <button class="tab-btn active" data-tab="treinos" onclick="switchTab('treinos')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6.5 6.5 11 11"/><path d="m21 21-1-1"/><path d="m3 3 1 1"/><path d="m18 22 4-4"/><path d="m2 6 4-4"/><path d="m3 10 7-7"/><path d="m14 21 7-7"/></svg>
-      <span>Treinos</span>
-      <div class="tab-dot"></div>
-    </button>
-    <button class="tab-btn" data-tab="dieta" onclick="switchTab('dieta')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.94c1.5 0 2.75 1.06 4 1.06 3 0 6-8 6-12.22A4.91 4.91 0 0 0 17 5c-2.22 0-4 1.44-5 2-1-.56-2.78-2-5-2a4.9 4.9 0 0 0-5 4.78C2 14 5 22 8 22c1.25 0 2.5-1.06 4-1.06Z"/><path d="M10 2c1 .5 2 2 2 5"/></svg>
-      <span>Dieta</span>
-    </button>
-    <button class="tab-btn" data-tab="perfil" onclick="switchTab('perfil')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-      <span>Perfil</span>
-    </button>
+    <div class="tab-bar-inner">
+      <button class="tab-btn active" data-tab="treinos" onclick="switchTab('treinos')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6.5 6.5 11 11"/><path d="m21 21-1-1"/><path d="m3 3 1 1"/><path d="m18 22 4-4"/><path d="m2 6 4-4"/><path d="m3 10 7-7"/><path d="m14 21 7-7"/></svg>
+        <span>Treinos</span>
+        <div class="tab-dot"></div>
+      </button>
+      <button class="tab-btn" data-tab="dieta" onclick="switchTab('dieta')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.94c1.5 0 2.75 1.06 4 1.06 3 0 6-8 6-12.22A4.91 4.91 0 0 0 17 5c-2.22 0-4 1.44-5 2-1-.56-2.78-2-5-2a4.9 4.9 0 0 0-5 4.78C2 14 5 22 8 22c1.25 0 2.5-1.06 4-1.06Z"/><path d="M10 2c1 .5 2 2 2 5"/></svg>
+        <span>Dieta</span>
+      </button>
+      <button class="tab-btn" data-tab="perfil" onclick="switchTab('perfil')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span>Perfil</span>
+      </button>
+    </div>
+    <div class="tab-bar-safe"></div>
   </div>
 </div>
 <input type="file" id="fileInput" accept=".json" style="display:none">
